@@ -1,5 +1,6 @@
 package com.project.teya.ledger.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.teya.ledger.model.TransactionType;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +16,6 @@ public class TransactionDto {
     private TransactionType type;
     private BigDecimal amount;
     private BigDecimal balanceAfter;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
     private LocalDateTime time;
 }
