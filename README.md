@@ -50,7 +50,7 @@ designing this application:
 
 ### Layered Architecture
 
-I designed this application using standard a Spring Boot architecture layout: separately splitting each component
+I designed this application using a standard Spring Boot architecture layout: separately splitting each component
 functionally and logically into different classes. For this simple solution, these are:
 
 - Controller layer
