@@ -16,10 +16,12 @@ All data is stored in the application's memory and does not require any external
 
 ## Getting Started
 
-I have fixed the Spring application to run on port `5555`. Below I will include some example requests you can perform to
-test its functionality
+- To build the project and run its tests, simply run `mvn clean install` from the root of the project in a terminal
+  window
+- To run the application, simply run `mvn spring-boot:run` from this same location in a terminal window
 
-### Getting current balance
+I have fixed the Spring application to run on port `5555`. Below I will include some example requests you can perform to
+test its functionality:
 
 ```curl -X GET http://localhost:5555/api/balance``` -
 This will return the current balance of the account
