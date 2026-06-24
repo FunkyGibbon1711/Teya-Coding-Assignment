@@ -1,0 +1,7 @@
+{
+  "id": "txn2",
+  "type": "WITHDRAWAL",
+  "amount": 100,
+  "balanceAfter": 0,
+  "time": "2026-06-23T20:00:00"
+}

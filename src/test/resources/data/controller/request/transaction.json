@@ -1,0 +1,5 @@
+{
+  "id": "txn1",
+  "amount": 100,
+  "type": "DEPOSIT"
+}

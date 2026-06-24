@@ -1,0 +1,18 @@
+{
+  "transactions": [
+    {
+      "amount": 100,
+      "balanceAfter": 100,
+      "id": "txn1",
+      "time": "%s",
+      "type": "DEPOSIT"
+    },
+    {
+      "amount": 100,
+      "balanceAfter": 0,
+      "id": "txn2",
+      "time": "%s",
+      "type": "WITHDRAWAL"
+    }
+  ]
+}

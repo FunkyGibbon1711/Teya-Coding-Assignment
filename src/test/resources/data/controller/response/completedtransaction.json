@@ -1,0 +1,7 @@
+{
+  "id": "txn1",
+  "type": "DEPOSIT",
+  "amount": 100,
+  "balanceAfter": 100,
+  "time": "%s"
+}
