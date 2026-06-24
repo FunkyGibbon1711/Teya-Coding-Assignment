@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 @AutoConfigureRestTestClient
 public class LedgerControllerIT {
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
 
     @Autowired
     RestTestClient restTestClient;
@@ -56,7 +56,7 @@ public class LedgerControllerIT {
         @Test
         @DisplayName("When ledger service successfully returns balance data, 200 OK response received with correct body")
         public void testSuccessfulRetrieval() throws IOException, JSONException {
-            LocalDateTime time = LocalDateTime.now();
+            LocalDateTime time = LocalDateTime.now(clock);
 
             when(ledgerService.getCurrentBalance())
                     .thenReturn(CurrentBalanceResponseDto.builder()
@@ -204,7 +204,7 @@ public class LedgerControllerIT {
         @Test
         @DisplayName("When valid transaction request made, ensure 200 OK response returned with transaction details")
         public void makeSuccessfulTransaction() throws IOException, JSONException {
-            LocalDateTime time = LocalDateTime.now();
+            LocalDateTime time = LocalDateTime.now(clock);
 
             when(ledgerService.performTransaction(any(TransactionRequestDto.class), anyString()))
                     .thenReturn(TransactionDto.builder()
@@ -262,6 +262,23 @@ public class LedgerControllerIT {
                     .uri("/api/transactions")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(TestUtils.loadFileAsString("data/controller/request/negativetransaction.json"))
+                    .exchange()
+                    .expectStatus()
+                    .isEqualTo(HttpStatus.BAD_REQUEST.value())
+                    .expectBody(String.class)
+                    .returnResult()
+                    .getResponseBody();
+
+            JSONAssert.assertEquals(TestUtils.loadFileAsString("data/400.json"), response, false);
+        }
+
+        @Test
+        @DisplayName("When zero transaction amount provided, ensure 400 BAD REQUEST returned")
+        public void testZeroTransAmount() throws IOException, JSONException {
+            String response = restTestClient.post()
+                    .uri("/api/transactions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(TestUtils.loadFileAsString("data/controller/request/zerotransaction.json"))
                     .exchange()
                     .expectStatus()
                     .isEqualTo(HttpStatus.BAD_REQUEST.value())

@@ -9,7 +9,7 @@ public class TransAmountValidator implements ConstraintValidator<ValidAmount, Bi
 
     @Override
     public boolean isValid(BigDecimal value, ConstraintValidatorContext context) {
-        if (value == null || value.compareTo(BigDecimal.ZERO) < 0) {
+        if (value == null || value.compareTo(BigDecimal.ZERO) <= 0) {
             return false;
         }
 
