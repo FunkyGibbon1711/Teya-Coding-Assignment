@@ -11,5 +11,5 @@ public interface LedgerService {
 
     public CurrentBalanceResponseDto getCurrentBalance();
 
-    public TransactionDto performTransaction(TransactionRequestDto request);
+    public TransactionDto performTransaction(TransactionRequestDto request, String txnId);
 }

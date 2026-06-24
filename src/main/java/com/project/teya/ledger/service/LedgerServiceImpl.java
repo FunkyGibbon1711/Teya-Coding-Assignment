@@ -44,7 +44,7 @@ public class LedgerServiceImpl implements LedgerService {
      *  1. Trying to withdraw more than we have as a balance (or if balance is just zero)
      *  2. Trying to withdraw a negative amount (or deposit a negative amount)
      *  */
-    public synchronized TransactionDto performTransaction(TransactionRequestDto request) throws ConflictException, DatabaseException {
+    public synchronized TransactionDto performTransaction(TransactionRequestDto request, String txnId) throws ConflictException, DatabaseException {
 
         /* Trying to withdraw more than account balance will throw an error
          *  Not going to allow overdrafts */
@@ -56,7 +56,7 @@ public class LedgerServiceImpl implements LedgerService {
          *  I will throw a ConflictException - this is to effectively account for an idempotency check
          *  to prevent duplicate transactions taking place */
         transactions.forEach(transactionDto -> {
-            if (transactionDto.getId().equals(request.getId())) {
+            if (transactionDto.getId().equals(txnId)) {
                 throw new ConflictException("Duplicate transaction received");
             }
         });
@@ -67,7 +67,7 @@ public class LedgerServiceImpl implements LedgerService {
         };
 
         TransactionDto transaction = TransactionDto.builder()
-                .id(request.getId())
+                .id(txnId)
                 .type(request.getType())
                 .amount(request.getAmount())
                 .time(LocalDateTime.now(clock))

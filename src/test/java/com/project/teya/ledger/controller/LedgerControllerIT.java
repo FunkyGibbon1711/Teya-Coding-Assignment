@@ -25,12 +25,14 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -41,6 +43,9 @@ public class LedgerControllerIT {
 
     @Autowired
     RestTestClient restTestClient;
+
+    @Autowired
+    Clock clock;
 
     @MockitoBean
     LedgerService ledgerService;
@@ -117,8 +122,8 @@ public class LedgerControllerIT {
         @Test
         @DisplayName("When transaction data successfully retrieved, ensure 200 OK response and correct response body")
         public void successfullyGetTransactionHistory() throws IOException, JSONException {
-            LocalDateTime earlyTime = LocalDateTime.now();
-            LocalDateTime lateTime = LocalDateTime.now();
+            LocalDateTime earlyTime = LocalDateTime.now(clock);
+            LocalDateTime lateTime = LocalDateTime.now(clock);
 
             TransactionDto trans1 = TransactionDto.builder()
                     .id("txn1")
@@ -201,7 +206,7 @@ public class LedgerControllerIT {
         public void makeSuccessfulTransaction() throws IOException, JSONException {
             LocalDateTime time = LocalDateTime.now();
 
-            when(ledgerService.performTransaction(any(TransactionRequestDto.class)))
+            when(ledgerService.performTransaction(any(TransactionRequestDto.class), anyString()))
                     .thenReturn(TransactionDto.builder()
                             .id("txn1")
                             .type(TransactionType.DEPOSIT)
@@ -214,6 +219,7 @@ public class LedgerControllerIT {
                     .uri("/api/transactions")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(TestUtils.loadFileAsString("data/controller/request/transaction.json"))
+                    .header("txnId", "txn1")
                     .exchange()
                     .expectStatus()
                     .isOk()
@@ -231,13 +237,14 @@ public class LedgerControllerIT {
         @Test
         @DisplayName("When ConflictException thrown, ensure 409 response returned with correct body")
         public void testConflictedTransaction() throws IOException, JSONException {
-            when(ledgerService.performTransaction(any(TransactionRequestDto.class)))
+            when(ledgerService.performTransaction(any(TransactionRequestDto.class), anyString()))
                     .thenThrow(new ConflictException("Duplicated payment request being made"));
 
             String response = restTestClient.post()
                     .uri("/api/transactions")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(TestUtils.loadFileAsString("data/controller/request/transaction.json"))
+                    .header("txnId", "txn1")
                     .exchange()
                     .expectStatus()
                     .isEqualTo(HttpStatus.CONFLICT.value())

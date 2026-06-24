@@ -13,9 +13,6 @@ import java.math.BigDecimal;
 public class TransactionRequestDto {
 
     @NotNull
-    String id;
-
-    @NotNull
     @ValidAmount
     BigDecimal amount;
 

@@ -27,7 +27,7 @@ public class LedgerController {
     }
 
     @PostMapping("/transactions")
-    public TransactionDto transaction(@Valid @RequestBody TransactionRequestDto request) {
-        return ledgerService.performTransaction(request);
+    public TransactionDto transaction(@Valid @RequestBody TransactionRequestDto request, @RequestHeader String txnId) {
+        return ledgerService.performTransaction(request, txnId);
     }
 }
