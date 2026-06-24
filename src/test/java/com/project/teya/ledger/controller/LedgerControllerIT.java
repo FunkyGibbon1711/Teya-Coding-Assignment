@@ -273,6 +273,23 @@ public class LedgerControllerIT {
         }
 
         @Test
+        @DisplayName("When zero transaction amount provided, ensure 400 BAD REQUEST returned")
+        public void testZeroTransAmount() throws IOException, JSONException {
+            String response = restTestClient.post()
+                    .uri("/api/transactions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(TestUtils.loadFileAsString("data/controller/request/zerotransaction.json"))
+                    .exchange()
+                    .expectStatus()
+                    .isEqualTo(HttpStatus.BAD_REQUEST.value())
+                    .expectBody(String.class)
+                    .returnResult()
+                    .getResponseBody();
+
+            JSONAssert.assertEquals(TestUtils.loadFileAsString("data/400.json"), response, false);
+        }
+
+        @Test
         @DisplayName("When NULL field provided where not expected, ensure 400 BAD REQUEST returned ")
         public void testNullTransAmount() throws IOException, JSONException {
             String response = restTestClient.post()
