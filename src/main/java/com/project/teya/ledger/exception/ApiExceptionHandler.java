@@ -16,11 +16,12 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({NegativeAmountException.class,
             MethodArgumentNotValidException.class,
-            IllegalArgumentException.class})
+            IllegalArgumentException.class,
+            Exception.class})
     public Response badRequest(Exception ex) {
         log.error("Bad request received: ", ex);
 
-        return new Response(ErrorCodes.BAD_REQUEST.name(), ErrorCodes.BAD_REQUEST.getReason());
+        return new Response(ErrorCodes.BAD_REQUEST.name(), String.format("%s - %s", ErrorCodes.BAD_REQUEST.getReason(), ex.getMessage()));
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -40,7 +41,7 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler({Exception.class})
+    @ExceptionHandler({DatabaseException.class})
     public Response internalServerError(Exception ex) {
         log.error("Internal server error: ", ex);
 
