@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
@@ -32,6 +33,7 @@ public class LedgerApplicationIT {
     RestTestClient restTestClient;
 
     @Test
+    @DirtiesContext
     @DisplayName("When no transaction history, ensure no data returned")
     public void testGetTransactionHistory() throws JSONException, IOException {
         String response = restTestClient.get()
@@ -47,12 +49,14 @@ public class LedgerApplicationIT {
     }
 
     @Test
+    @DirtiesContext
     @DisplayName("When no balance in account, ensure withdrawals are prevented")
     public void testOverdraft() throws JSONException, IOException {
         String response = restTestClient.post()
                 .uri("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(TestUtils.loadFileAndTemplate("data/integration/request/withdrawalrequest100.json", "txn1"))
+                .body(TestUtils.loadFileAsString("data/integration/request/withdrawalrequest100.json"))
+                .header("txnId", "txn1")
                 .exchange()
                 .expectStatus()
                 .isEqualTo(HttpStatus.BAD_REQUEST.value())
@@ -64,12 +68,14 @@ public class LedgerApplicationIT {
     }
 
     @Test
-    @DisplayName("")
+    @DirtiesContext
+    @DisplayName("When a transaction with the same txnId is received, ensure 409 CONFLICT is returned")
     public void testDuplicateTransaction() throws JSONException, IOException {
         restTestClient.post()
                 .uri("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(TestUtils.loadFileAndTemplate("data/integration/request/depositrequest100.json", "txn1"))
+                .body(TestUtils.loadFileAsString("data/integration/request/depositrequest100.json"))
+                .header("txnId", "txn1")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -77,7 +83,8 @@ public class LedgerApplicationIT {
         restTestClient.post()
                 .uri("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(TestUtils.loadFileAndTemplate("data/integration/request/withdrawalrequest100.json", "txn2"))
+                .body(TestUtils.loadFileAsString("data/integration/request/withdrawalrequest100.json"))
+                .header("txnId", "txn2")
                 .exchange()
                 .expectStatus()
                 .isOk();
@@ -86,19 +93,22 @@ public class LedgerApplicationIT {
         restTestClient.post()
                 .uri("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(TestUtils.loadFileAndTemplate("data/integration/request/depositrequest100.json", "txn1"))
+                .body(TestUtils.loadFileAsString("data/integration/request/depositrequest100.json"))
+                .header("txnId", "txn1")
                 .exchange()
                 .expectStatus()
                 .isEqualTo(HttpStatus.CONFLICT.value());
     }
 
     @Test
+    @DirtiesContext
     @DisplayName("When multiple transactions made, ensure balance handled correctly and transaction history accurate")
     public void testMultipleTransactions() throws JSONException, IOException {
         String depositResponse = restTestClient.post()
                 .uri("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(TestUtils.loadFileAndTemplate("data/integration/request/depositrequest100.json", "txn1"))
+                .body(TestUtils.loadFileAsString("data/integration/request/depositrequest100.json"))
+                .header("txnId", "txn1")
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -109,7 +119,8 @@ public class LedgerApplicationIT {
         String withdrawalResponse = restTestClient.post()
                 .uri("/api/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(TestUtils.loadFileAndTemplate("data/integration/request/withdrawalrequest100.json", "txn2"))
+                .body(TestUtils.loadFileAsString("data/integration/request/withdrawalrequest100.json"))
+                .header("txnId", "txn2")
                 .exchange()
                 .expectStatus()
                 .isOk()

@@ -1,5 +1,4 @@
 {
-  "id": "%s",
   "amount": 100,
   "type": "WITHDRAWAL"
 }
